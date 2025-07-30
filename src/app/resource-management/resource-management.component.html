@@ -1,0 +1,240 @@
+<div class="edash-root" [class.dark-mode]="darkMode">
+  <!-- Sidenav -->
+  <aside class="edash-sidenav" [class.collapsed]="sidebarCollapsed" [class.dark-mode]="darkMode">
+    <div class="edash-sidenav-header">
+      <img src="https://lms-frontend-resources.s3.ap-south-1.amazonaws.com/marlnLogo.jpeg" alt="Logo" class="edash-logo" />
+      <span *ngIf="!sidebarCollapsed" class="edash-title">Marketing Head</span>
+    </div>
+    <nav class="edash-nav">
+      <a routerLink="/marketing-head" class="edash-nav-link" data-title="Dashboard">
+        <span class="edash-nav-icon">📊</span>
+        <span *ngIf="!sidebarCollapsed">Dashboard</span>
+      </a>
+      <a routerLink="/marketing-team" class="edash-nav-link" data-title="Team Management">
+        <span class="edash-nav-icon">👥</span>
+        <span *ngIf="!sidebarCollapsed">Team Management</span>
+      </a>
+      <a routerLink="/leads" class="edash-nav-link" data-title="Leads">
+        <span class="edash-nav-icon">🎯</span>
+        <span *ngIf="!sidebarCollapsed">Leads</span>
+      </a>
+     
+      <a routerLink="/resource-management" class="edash-nav-link active" data-title="Resource Management">
+        <span class="edash-nav-icon">📦</span>
+        <span *ngIf="!sidebarCollapsed">Resource Management</span>
+      </a>
+      <a routerLink="/report-analytics" class="edash-nav-link" data-title="Report & Analytics">
+        <span class="edash-nav-icon">📈</span>
+        <span *ngIf="!sidebarCollapsed">Report & Analytics</span>
+      </a>
+      
+      <a routerLink="/training" class="edash-nav-link" data-title="Training & Develop">
+        <span class="edash-nav-icon">🎓</span>
+        <span *ngIf="!sidebarCollapsed">Training & Develop</span>
+      </a>
+      
+      <a routerLink="/help-support" class="edash-nav-link" data-title="Help & Support">
+        <span class="edash-nav-icon">🆘</span>
+        <span *ngIf="!sidebarCollapsed">Help & Support</span>
+      </a>
+      <div class="edash-nav-actions">
+        <button class="edash-logout" (click)="logout()" aria-label="Logout" data-title="Logout">
+          <span class="icon">🚪</span>
+          <span *ngIf="!sidebarCollapsed">Logout</span>
+        </button>
+        <button class="edash-sidenav-toggle" (click)="sidebarCollapsed=!sidebarCollapsed" aria-label="Toggle sidenav" data-title="Collapse">
+          <span class="icon">⬅️</span>
+          <span *ngIf="!sidebarCollapsed">Collapse</span>
+        </button>
+        <button class="edash-dark-toggle" (click)="toggleDarkMode()" aria-label="Toggle dark mode" data-title="Light Mode">
+          <span class="icon">☀️</span>
+          <span *ngIf="!sidebarCollapsed">Light Mode</span>
+        </button>
+      </div>
+    </nav>
+  </aside>
+  
+  <!-- Main Content -->
+  <main class="edash-main" [class.sidebar-collapsed]="sidebarCollapsed" [class.dark-mode]="darkMode">
+    <div class="dashboard-header">
+      <div>
+        <h1 class="header-title">Resource Management</h1>
+        <p class="header-subtitle">Manage and optimize your marketing resources efficiently</p>
+      </div>
+    </div>
+    
+    <div class="dashboard-content">
+      <!-- Resource Overview -->
+      <div class="resource-overview">
+        <div class="overview-card">
+          <div class="overview-title">Total Resources</div>
+          <div class="overview-value">{{ totalResources }}</div>
+          <div class="overview-change positive">
+            <span>↗</span>
+            <span>+12% from last month</span>
+          </div>
+        </div>
+        
+        <div class="overview-card">
+          <div class="overview-title">Available Resources</div>
+          <div class="overview-value">{{ availableResources }}</div>
+          <div class="overview-change positive">
+            <span>↗</span>
+            <span>+8% from last month</span>
+          </div>
+        </div>
+        
+        <div class="overview-card">
+          <div class="overview-title">Utilization Rate</div>
+          <div class="overview-value">{{ utilizationRate }}%</div>
+          <div class="overview-change neutral">
+            <span>→</span>
+            <span>Stable</span>
+          </div>
+        </div>
+        
+        <div class="overview-card">
+          <div class="overview-title">Total Cost</div>
+          <div class="overview-value">${{ totalCost.toLocaleString() }}</div>
+          <div class="overview-change negative">
+            <span>↘</span>
+            <span>-5% from last month</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Resource Filters -->
+      <div class="resource-filters">
+        <div class="filters-header">
+          <h3 class="filters-title">Resource Filters</h3>
+          <div class="filters-actions">
+            <button class="filter-btn" [class.active]="selectedType === ''" (click)="filterByType('')">All Types</button>
+            <button class="filter-btn" [class.active]="selectedType === 'human'" (click)="filterByType('human')">Human</button>
+            <button class="filter-btn" [class.active]="selectedType === 'equipment'" (click)="filterByType('equipment')">Equipment</button>
+            <button class="filter-btn" [class.active]="selectedType === 'budget'" (click)="filterByType('budget')">Budget</button>
+            <button class="filter-btn" [class.active]="selectedType === 'technology'" (click)="filterByType('technology')">Technology</button>
+          </div>
+        </div>
+        
+        <div class="filters-row">
+          <div class="filter-group">
+            <label class="filter-label">Search Resources</label>
+            <input type="text" class="filter-input" placeholder="Search by name..." [(ngModel)]="searchTerm" (input)="filterResources()">
+          </div>
+          
+          <div class="filter-group">
+            <label class="filter-label">Department</label>
+            <select class="filter-input" [(ngModel)]="selectedDepartment" (change)="filterResources()">
+              <option value="">All Departments</option>
+              <option value="Marketing">Marketing</option>
+              <option value="Sales">Sales</option>
+              <option value="IT">IT</option>
+              <option value="HR">HR</option>
+            </select>
+          </div>
+          
+          <div class="filter-group">
+            <label class="filter-label">Status</label>
+            <select class="filter-input" [(ngModel)]="selectedStatus" (change)="filterResources()">
+              <option value="">All Status</option>
+              <option value="available">Available</option>
+              <option value="allocated">Allocated</option>
+              <option value="maintenance">Maintenance</option>
+              <option value="depleted">Depleted</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Resources Table -->
+      <div class="resource-table">
+        <div class="table-header">
+          <h3 class="table-title">Resource Inventory</h3>
+          <div class="table-actions">
+            <button class="action-btn btn-secondary" (click)="importResources()">
+              <span>📥</span>
+              <span>Import</span>
+            </button>
+            <button class="action-btn btn-secondary" (click)="exportResources()">
+              <span>📤</span>
+              <span>Export</span>
+            </button>
+            <button class="action-btn btn-primary" (click)="addResource()">
+              <span>➕</span>
+              <span>Add Resource</span>
+            </button>
+          </div>
+        </div>
+        
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Resource Name</th>
+              <th>Type</th>
+              <th>Department</th>
+              <th>Status</th>
+              <th>Cost</th>
+              <th>Utilization</th>
+              <th>Last Updated</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let resource of paginatedResources">
+              <td>
+                <div>
+                  <div style="font-weight: 500;">{{ resource.name }}</div>
+                  <div style="font-size: 0.75rem; color: #64748b;">{{ resource.description || 'No description' }}</div>
+                </div>
+              </td>
+              <td>
+                <span class="status-badge" [class]="'status-' + resource.type">
+                  {{ resource.type }}
+                </span>
+              </td>
+              <td>{{ resource.department }}</td>
+              <td>
+                <span class="status-badge" [class]="'status-' + resource.status">
+                  {{ resource.status }}
+                </span>
+              </td>
+              <td>${{ resource.cost.toLocaleString() }}</td>
+              <td>
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                  <div class="utilization-bar">
+                    <div class="utilization-fill" 
+                         [class]="resource.utilization < 30 ? 'utilization-low' : resource.utilization < 70 ? 'utilization-medium' : 'utilization-high'"
+                         [style.width.%]="resource.utilization"></div>
+                  </div>
+                  <span style="font-size: 0.75rem;">{{ resource.utilization }}%</span>
+                </div>
+              </td>
+              <td>{{ resource.lastUpdated }}</td>
+              <td>
+                <div class="resource-actions">
+                  <span class="action-icon" (click)="viewResource(resource)" title="View">👁️</span>
+                  <span class="action-icon" (click)="editResource(resource)" title="Edit">✏️</span>
+                  <span class="action-icon" (click)="allocateResource(resource)" title="Allocate">📋</span>
+                  <span class="action-icon" (click)="deleteResource(resource)" title="Delete">🗑️</span>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        
+        <div class="pagination">
+          <div class="pagination-info">
+            Showing {{ (currentPage - 1) * pageSize + 1 }} to {{ Math.min(currentPage * pageSize, filteredResources.length) }} of {{ filteredResources.length }} resources
+          </div>
+          <div class="pagination-controls">
+            <button class="page-btn" [disabled]="currentPage === 1" (click)="previousPage()">Previous</button>
+            <button class="page-btn" [class.active]="currentPage === 1" (click)="goToPage(1)">1</button>
+            <button class="page-btn" [class.active]="currentPage === 2" (click)="goToPage(2)">2</button>
+            <button class="page-btn" [class.active]="currentPage === 3" (click)="goToPage(3)">3</button>
+            <button class="page-btn" [disabled]="currentPage === totalPages" (click)="nextPage()">Next</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div> 

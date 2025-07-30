@@ -1,0 +1,259 @@
+<div class="edash-root" [class.dark-mode]="darkMode" [class.sidebar-collapsed]="sidebarCollapsed">
+  <!-- Sidebar -->
+  <aside class="edash-sidenav" [class.collapsed]="sidebarCollapsed" [class.dark-mode]="darkMode">
+    <div class="edash-sidenav-header">
+      <img src="https://lms-frontend-resources.s3.ap-south-1.amazonaws.com/marlnLogo.jpeg" alt="Logo" class="edash-logo" />
+      <span *ngIf="!sidebarCollapsed" class="edash-title">Marketing Head</span>
+    </div>
+    <nav class="edash-nav">
+      <a routerLink="/marketing-head" class="edash-nav-link" data-title="Dashboard">
+        <span class="edash-nav-icon">📊</span>
+        <span *ngIf="!sidebarCollapsed">Dashboard</span>
+      </a>
+      <a routerLink="/marketing-team" class="edash-nav-link" data-title="Team Management">
+        <span class="edash-nav-icon">👥</span>
+        <span *ngIf="!sidebarCollapsed">Team Management</span>
+      </a>
+      <a routerLink="/leads" class="edash-nav-link" data-title="Leads">
+        <span class="edash-nav-icon">🎯</span>
+        <span *ngIf="!sidebarCollapsed">Leads</span>
+      </a>
+      <a routerLink="/resource-management" class="edash-nav-link" data-title="Resource Management">
+        <span class="edash-nav-icon">📦</span>
+        <span *ngIf="!sidebarCollapsed">Resource Management</span>
+      </a>
+      <a routerLink="/report-analytics" class="edash-nav-link" data-title="Report & Analytics">
+        <span class="edash-nav-icon">📈</span>
+        <span *ngIf="!sidebarCollapsed">Report & Analytics</span>
+      </a>
+      <a routerLink="/training-development" class="edash-nav-link" data-title="Training & Develop">
+        <span class="edash-nav-icon">🎓</span>
+        <span *ngIf="!sidebarCollapsed">Training & Develop</span>
+      </a>
+      <a routerLink="/help-support" class="edash-nav-link active" data-title="Help & Support">
+        <span class="edash-nav-icon">🆘</span>
+        <span *ngIf="!sidebarCollapsed">Help & Support</span>
+      </a>
+      <div class="edash-nav-actions">
+        <button class="edash-logout" (click)="logout()" aria-label="Logout" data-title="Logout">
+          <span class="icon">🚪</span>
+          <span *ngIf="!sidebarCollapsed">Logout</span>
+        </button>
+        <button class="edash-sidenav-toggle" (click)="sidebarCollapsed=!sidebarCollapsed" aria-label="Toggle sidenav" data-title="Collapse">
+          <span class="icon">⬅️</span>
+          <span *ngIf="!sidebarCollapsed">Collapse</span>
+        </button>
+        <button class="edash-dark-toggle" (click)="toggleDarkMode()" aria-label="Toggle dark mode" data-title="Light Mode">
+          <span class="icon">☀️</span>
+          <span *ngIf="!sidebarCollapsed">Light Mode</span>
+        </button>
+      </div>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="edash-main" [class.sidebar-collapsed]="sidebarCollapsed">
+
+    <div class="edash-content">
+      <!-- Search Section -->
+      <div class="help-search-section">
+        <div class="search-container">
+          <input 
+            type="text" 
+            [(ngModel)]="searchTerm" 
+            (input)="searchContent()"
+            placeholder="Search for help articles, FAQs, or support tickets..."
+            class="search-input"
+          >
+          <button class="search-btn">🔍</button>
+        </div>
+        <button class="clear-filters-btn" (click)="clearFilters()">Clear Filters</button>
+      </div>
+
+      <!-- Quick Stats -->
+      <div class="help-stats-grid">
+        <div class="help-stat-card">
+          <div class="stat-icon">📋</div>
+          <div class="stat-content">
+            <h3>{{ tickets.length }}</h3>
+            <p>Support Tickets</p>
+          </div>
+        </div>
+        <div class="help-stat-card">
+          <div class="stat-icon">❓</div>
+          <div class="stat-content">
+            <h3>{{ faqs.length }}</h3>
+            <p>FAQ Articles</p>
+          </div>
+        </div>
+        <div class="help-stat-card">
+          <div class="stat-icon">📚</div>
+          <div class="stat-content">
+            <h3>{{ knowledgeArticles.length }}</h3>
+            <p>Knowledge Base</p>
+          </div>
+        </div>
+        <div class="help-stat-card">
+          <div class="stat-icon">⚡</div>
+          <div class="stat-content">
+            <h3>{{ openTicketsCount }}</h3>
+            <p>Open Issues</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Support Tickets Section -->
+      <div class="help-section">
+        <div class="section-header">
+          <h2>Support Tickets</h2>
+          <button class="create-ticket-btn" (click)="createTicket()">+ Create Ticket</button>
+        </div>
+
+        <!-- Filters -->
+        <div class="ticket-filters">
+          <select [(ngModel)]="selectedCategory" (change)="filterTickets()" class="filter-select">
+            <option value="">All Categories</option>
+            <option value="technical">Technical</option>
+            <option value="billing">Billing</option>
+            <option value="feature">Feature Request</option>
+            <option value="bug">Bug Report</option>
+            <option value="general">General</option>
+          </select>
+          <select [(ngModel)]="selectedPriority" (change)="filterTickets()" class="filter-select">
+            <option value="">All Priorities</option>
+            <option value="urgent">Urgent</option>
+            <option value="high">High</option>
+            <option value="medium">Medium</option>
+            <option value="low">Low</option>
+          </select>
+          <select [(ngModel)]="selectedStatus" (change)="filterTickets()" class="filter-select">
+            <option value="">All Status</option>
+            <option value="open">Open</option>
+            <option value="in-progress">In Progress</option>
+            <option value="resolved">Resolved</option>
+            <option value="closed">Closed</option>
+          </select>
+        </div>
+
+        <!-- Tickets List -->
+        <div class="tickets-list">
+          <div *ngFor="let ticket of filteredTickets" class="ticket-card">
+            <div class="ticket-header">
+              <div class="ticket-category">
+                <span class="category-icon">{{ getCategoryIcon(ticket.category) }}</span>
+                <span class="category-text">{{ ticket.category | titlecase }}</span>
+              </div>
+              <div class="ticket-priority" [style.background-color]="getPriorityColor(ticket.priority)">
+                {{ ticket.priority | titlecase }}
+              </div>
+            </div>
+            <h3 class="ticket-title">{{ ticket.title }}</h3>
+            <p class="ticket-description">{{ ticket.description }}</p>
+            <div class="ticket-meta">
+              <span class="ticket-status" [style.background-color]="getStatusColor(ticket.status)">
+                {{ ticket.status | titlecase }}
+              </span>
+              <span class="ticket-date">Created: {{ ticket.createdAt | date:'short' }}</span>
+              <span *ngIf="ticket.assignedTo" class="ticket-assigned">Assigned to: {{ ticket.assignedTo }}</span>
+            </div>
+            <div class="ticket-actions">
+              <button class="action-btn edit-btn" (click)="updateTicket(ticket)">Edit</button>
+              <button class="action-btn delete-btn" (click)="deleteTicket(ticket)">Delete</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FAQ Section -->
+      <div class="help-section">
+        <div class="section-header">
+          <h2>Frequently Asked Questions</h2>
+        </div>
+        <div class="faq-list">
+          <div *ngFor="let faq of filteredFAQs" class="faq-card">
+            <div class="faq-question">
+              <h3>{{ faq.question }}</h3>
+              <span class="faq-category">{{ faq.category }}</span>
+            </div>
+            <div class="faq-answer">
+              <p>{{ faq.answer }}</p>
+            </div>
+            <div class="faq-feedback">
+              <span class="feedback-text">Was this helpful?</span>
+              <button class="feedback-btn helpful" (click)="markFAQHelpful(faq)">
+                👍 Helpful ({{ faq.helpful }})
+              </button>
+              <button class="feedback-btn not-helpful" (click)="markFAQNotHelpful(faq)">
+                👎 Not Helpful ({{ faq.notHelpful }})
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Knowledge Base Section -->
+      <div class="help-section">
+        <div class="section-header">
+          <h2>Knowledge Base</h2>
+        </div>
+        <div class="knowledge-grid">
+          <div *ngFor="let article of filteredArticles" class="knowledge-card">
+            <div class="article-header">
+              <h3>{{ article.title }}</h3>
+              <span class="article-category">{{ article.category }}</span>
+            </div>
+            <p class="article-excerpt">{{ article.content.substring(0, 150) }}...</p>
+            <div class="article-meta">
+              <span class="article-author">By {{ article.author }}</span>
+              <span class="article-date">{{ article.createdAt | date:'short' }}</span>
+            </div>
+            <div class="article-stats">
+              <span class="stat">👁️ {{ article.views }} views</span>
+              <span class="stat">👍 {{ article.helpful }} helpful</span>
+            </div>
+            <div class="article-tags">
+              <span *ngFor="let tag of article.tags" class="tag">{{ tag }}</span>
+            </div>
+            <div class="article-actions">
+              <button class="view-btn" (click)="viewArticle(article)">Read Article</button>
+              <button class="helpful-btn" (click)="markArticleHelpful(article)">👍 Helpful</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact Support Section -->
+      <div class="help-section">
+        <div class="section-header">
+          <h2>Still Need Help?</h2>
+        </div>
+        <div class="contact-support-grid">
+          <div class="contact-card">
+            <div class="contact-icon">📧</div>
+            <h3>Email Support</h3>
+            <p>Get help via email within 24 hours</p>
+            <button class="contact-btn">Send Email</button>
+          </div>
+          <div class="contact-card">
+            <div class="contact-icon">💬</div>
+            <h3>Live Chat</h3>
+            <p>Chat with our support team in real-time</p>
+            <button class="contact-btn">Start Chat</button>
+          </div>
+          <div class="contact-card">
+            <div class="contact-icon">📞</div>
+            <h3>Phone Support</h3>
+            <p>Call us for immediate assistance</p>
+            <button class="contact-btn">Call Now</button>
+          </div>
+          <div class="contact-card">
+            <div class="contact-icon">📖</div>
+            <h3>Documentation</h3>
+            <p>Access comprehensive guides and tutorials</p>
+            <button class="contact-btn">View Docs</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div> 
