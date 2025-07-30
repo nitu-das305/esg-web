@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { PLATFORM_ID, Inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'app-login',
@@ -554,14 +556,19 @@ export class LoginComponent implements OnInit {
   selectedRole = '';
   errorMessage = '';
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) {}
 
   ngOnInit() {
     // Check if user is already logged in
-    const currentUser = localStorage.getItem('currentUser');
-    if (currentUser) {
-      const user = JSON.parse(currentUser);
-      this.redirectToDashboard(user.role);
+    if (isPlatformBrowser(this.platformId)) {
+      const currentUser = localStorage.getItem('currentUser');
+      if (currentUser) {
+        const user = JSON.parse(currentUser);
+        this.redirectToDashboard(user.role);
+      }
     }
   }
 
@@ -593,10 +600,12 @@ export class LoginComponent implements OnInit {
     // Mock authentication - in real app, this would call an API
     if (this.username === 'admin' && this.password === 'admin') {
       // Store user info in localStorage or service
-      localStorage.setItem('currentUser', JSON.stringify({
-        username: this.username,
-        role: this.selectedRole
-      }));
+      if (isPlatformBrowser(this.platformId)) {
+        localStorage.setItem('currentUser', JSON.stringify({
+          username: this.username,
+          role: this.selectedRole
+        }));
+      }
       
       // Redirect based on role
       this.redirectToDashboard(this.selectedRole);
@@ -632,13 +641,17 @@ export class LoginComponent implements OnInit {
 
   // Static method to logout (can be called from other components)
   static logout(router: Router) {
-    localStorage.removeItem('currentUser');
+    if (typeof window !== 'undefined' && window.localStorage) {
+      localStorage.removeItem('currentUser');
+    }
     router.navigate(['/login']);
   }
 
   // Method to clear session for testing
   clearSession() {
-    localStorage.removeItem('currentUser');
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.removeItem('currentUser');
+    }
     window.location.reload();
   }
 } 
